@@ -110,7 +110,7 @@ struct ControlView: View {
                     .foregroundColor(.secondary)
                     .font(.caption)
             }
-            .padding(.horizontal, 4)
+            .padding(.horizontal, 20)
             .padding(.bottom, 4)
             .padding(.top, 0)
         }

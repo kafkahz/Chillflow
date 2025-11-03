@@ -1,4 +1,5 @@
 import SwiftUI
+import AppKit
 
 struct StatsView: View {
     @EnvironmentObject var statsManager: StatsManager
@@ -6,37 +7,39 @@ struct StatsView: View {
     @State private var hoveredCell: (day: Int, slot: Int)? = nil
     
     var body: some View {
-        VStack(spacing: 12) {
-            // 周选择和日期范围
-            HStack {
-                Button(action: {
-                    weekOffset -= 1
-                }) {
-                    Image(systemName: "chevron.left")
+        VStack(spacing: 0) {
+            // 中间内容组
+            VStack(spacing: 10) {
+                // 周选择和日期范围
+                HStack {
+                    Button(action: {
+                        weekOffset -= 1
+                    }) {
+                        Image(systemName: "chevron.left")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
+                    
+                    let statsForHeader = statsManager.getWeeklyStats(weekOffset: weekOffset)
+                    Text(statsForHeader.dateRange)
+                        .font(.headline)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        weekOffset += 1
+                    }) {
+                        Image(systemName: "chevron.right")
+                    }
+                    .buttonStyle(PlainButtonStyle())
                 }
-                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 20)
+                .padding(.top, 15)
                 
-                Spacer()
-                
-                let statsForHeader = statsManager.getWeeklyStats(weekOffset: weekOffset)
-                Text(statsForHeader.dateRange)
-                    .font(.headline)
-                
-                Spacer()
-                
-                Button(action: {
-                    weekOffset += 1
-                }) {
-                    Image(systemName: "chevron.right")
-                }
-                .buttonStyle(PlainButtonStyle())
-            }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            
-            // 总专注时长和热力图
-            Group {
-                let stats = statsManager.getWeeklyStats(weekOffset: weekOffset)
+                // 总专注时长和热力图
+                Group {
+                    let stats = statsManager.getWeeklyStats(weekOffset: weekOffset)
                 
                 let displayText: String = {
                     if let hovered = hoveredCell {
@@ -44,18 +47,22 @@ struct StatsView: View {
                         let now = Date()
                         var components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)
                         components.weekOfYear = (components.weekOfYear ?? 0) + weekOffset
-                        if let weekStart = calendar.date(from: components) {
-                            let targetDate = calendar.date(byAdding: .day, value: hovered.day, to: weekStart)!
-                            let duration = statsManager.getHourlyStats(for: targetDate, hour: hovered.slot * 8, timeSlot: hovered.slot)
-                            
-                            let dateFormatter = DateFormatter()
-                            dateFormatter.dateFormat = "M月d日"
-                            let dateStr = dateFormatter.string(from: targetDate)
-                            let timeRange = getTimeRange(for: hovered.slot)
-                            return "\(dateStr) \(timeRange): \(formatDuration(duration))"
-                        } else {
-                            return "本周总专注时长: \(formatDuration(stats.totalDuration))"
+                        if let weekStartDate = calendar.date(from: components) {
+                            // 确保是周一
+                            let weekday = calendar.component(.weekday, from: weekStartDate)
+                            let daysFromMonday = weekday == 1 ? 1 : weekday - 2
+                            if let weekStart = calendar.date(byAdding: .day, value: daysFromMonday, to: weekStartDate) {
+                                let targetDate = calendar.date(byAdding: .day, value: hovered.day, to: weekStart)!
+                                let duration = statsManager.getHourlyStats(for: targetDate, hour: hovered.slot * 8, timeSlot: hovered.slot)
+                                
+                                let dateFormatter = DateFormatter()
+                                dateFormatter.dateFormat = "M月d日"
+                                let dateStr = dateFormatter.string(from: targetDate)
+                                let timeRange = getTimeRange(for: hovered.slot)
+                                return "\(dateStr) \(timeRange): \(formatDuration(duration))"
+                            }
                         }
+                        return "本周总专注时长: \(formatDuration(stats.totalDuration))"
                     } else {
                         return "本周总专注时长: \(formatDuration(stats.totalDuration))"
                     }
@@ -83,8 +90,9 @@ struct StatsView: View {
                         HStack(spacing: 4) {
                             // 热力图单元格
                             ForEach(0..<7) { day in
+                                let cellValue = stats.heatmap[day][slot]
                                 HeatmapCell(
-                                    value: stats.heatmap[day][slot],
+                                    value: cellValue,
                                     maxValue: getMaxValue(stats.heatmap),
                                     isHovered: hoveredCell?.day == day && hoveredCell?.slot == slot
                                 )
@@ -101,7 +109,24 @@ struct StatsView: View {
                     }
                 }
                 .padding(.vertical, 6)
+                }
             }
+            
+            Spacer()
+                .frame(height: 30)
+            
+            // GitHub链接按钮
+            Button(action: {
+                if let url = URL(string: "https://github.com/kafkahz/Chillflow") {
+                    NSWorkspace.shared.open(url)
+                }
+            }) {
+                Text("ChillFlow")
+                    .font(.caption)
+                    .foregroundColor(.blue)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.bottom, 8)
         }
         .padding(.bottom, 8)
     }
@@ -132,8 +157,13 @@ struct StatsView: View {
     }
     
     private func getMaxValue(_ heatmap: [[TimeInterval]]) -> TimeInterval {
-        let maxValue = heatmap.flatMap { $0 }.max() ?? 1.0
-        return max(maxValue, 3600) // 至少1小时作为基准
+        let maxValue = heatmap.flatMap { $0 }.max() ?? 0.0
+        // 如果有数据，使用实际最大值；如果没有数据，返回一个基准值用于计算
+        if maxValue > 0 {
+            return maxValue
+        } else {
+            return 3600 // 至少1小时作为基准，但只在没有数据时使用
+        }
     }
 }
 
@@ -143,15 +173,33 @@ struct HeatmapCell: View {
     let isHovered: Bool
     
     var body: some View {
-        let intensity = min(1.0, value / maxValue)
-        let color = Color.blue.opacity(0.2 + intensity * 0.8)
+        // 有数据就显示明显颜色，无数据显示淡色
+        let hasData = value > 0
+        
+        let backgroundColor: Color = {
+            if hasData {
+                // 计算强度比例：当前值相对于最大值的比例
+                let intensity = maxValue > 0 ? min(1.0, value / maxValue) : 1.0
+                
+                // 扩大不透明度范围：从0.3到1.0，让颜色深浅差异更明显
+                // 使用平方根函数让渐变更平滑自然
+                let normalizedIntensity = sqrt(intensity) // 平方根使低值更明显
+                let opacity = 0.3 + normalizedIntensity * 0.7 // 范围：0.3 - 1.0
+                
+                // 根据强度调整颜色：低强度用较淡的蓝色，高强度用较深的蓝色
+                return Color(NSColor.systemBlue).opacity(opacity)
+            } else {
+                // 无数据时使用很淡的背景色
+                return Color(NSColor.separatorColor).opacity(0.15)
+            }
+        }()
         
         RoundedRectangle(cornerRadius: 4)
-            .fill(color)
+            .fill(backgroundColor)
             .frame(height: 24)
             .overlay(
                 RoundedRectangle(cornerRadius: 4)
-                    .stroke(isHovered ? Color.blue : Color.clear, lineWidth: 2)
+                    .stroke(isHovered ? Color.accentColor : Color.clear, lineWidth: 2)
             )
     }
 }

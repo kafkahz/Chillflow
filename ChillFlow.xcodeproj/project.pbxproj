@@ -15,7 +15,7 @@
 		F1011 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1012 /* MainView.swift */; };
 		F1013 /* ControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1014 /* ControlView.swift */; };
 		F1015 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1016 /* StatsView.swift */; };
-		FCC7AD2D2EB4B93A00B1871E /* focus2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FCC7AD2C2EB4B93A00B1871E /* focus2.mp3 */; };
+		FC1988CC2EB8929B0053533B /* focus2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FC1988CB2EB8929B0053533B /* focus2.mp3 */; };
 		FCC7AD2E2EB4B93A00B1871E /* focus1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FCC7AD2B2EB4B93A00B1871E /* focus1.mp3 */; };
 /* End PBXBuildFile section */
 
@@ -30,8 +30,8 @@
 		F1016 /* StatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatsView.swift; sourceTree = "<group>"; };
 		F1018 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F1019 /* ChillFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC1988CB2EB8929B0053533B /* focus2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus2.mp3; sourceTree = "<group>"; };
 		FCC7AD2B2EB4B93A00B1871E /* focus1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus1.mp3; sourceTree = "<group>"; };
-		FCC7AD2C2EB4B93A00B1871E /* focus2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus2.mp3; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -46,8 +46,8 @@
 		F1022 /* ChillFlow */ = {
 			isa = PBXGroup;
 			children = (
+				FC1988CB2EB8929B0053533B /* focus2.mp3 */,
 				FCC7AD2B2EB4B93A00B1871E /* focus1.mp3 */,
-				FCC7AD2C2EB4B93A00B1871E /* focus2.mp3 */,
 				F1002 /* ChillFlowApp.swift */,
 				F1024 /* Models */,
 				F1025 /* Managers */,
@@ -153,7 +153,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FCC7AD2D2EB4B93A00B1871E /* focus2.mp3 in Resources */,
+				FC1988CC2EB8929B0053533B /* focus2.mp3 in Resources */,
 				FCC7AD2E2EB4B93A00B1871E /* focus1.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

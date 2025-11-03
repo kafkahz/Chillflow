@@ -3,7 +3,7 @@ import AVFoundation
 import Combine
 
 class AudioManager: ObservableObject {
-    @Published var volume: Float = 0.5 {
+    @Published var volume: Float = 1 {
         didSet {
             player?.volume = volume
         }
@@ -15,35 +15,60 @@ class AudioManager: ObservableObject {
     private var isFading = false
     
     // 音频文件名称
-    private let focusTracks = ["Focus-Track-01", "Focus-Track-02"]
+    private let focusTracks = ["focus1", "focus2"]
     
     init() {
         // macOS不需要AVAudioSession设置
     }
     
     func playFocusAudio() {
-        guard !isFading else { return }
+        // 如果已经在播放，且不是正在淡入淡出，则不需要重新播放
+        if let player = player, player.isPlaying, !isFading {
+            print("AudioManager: 音频已在播放，跳过重新播放")
+            return
+        }
+        
+        guard !isFading else { 
+            print("AudioManager: 正在淡入淡出，跳过播放")
+            return 
+        }
         
         let trackName = focusTracks.randomElement() ?? focusTracks[0]
+        print("AudioManager: 尝试播放音频: \(trackName).mp3")
         
         guard let url = Bundle.main.url(forResource: trackName, withExtension: "mp3") else {
-            print("Audio file not found: \(trackName)")
+            print("AudioManager: 错误 - 音频文件未找到: \(trackName).mp3")
+            print("AudioManager: Bundle资源路径: \(Bundle.main.resourcePath ?? "nil")")
             // 创建一个占位音频（静音循环）
             createPlaceholderAudio()
             return
         }
         
+        print("AudioManager: 找到音频文件: \(url.path)")
+        
         do {
-            player = try AVAudioPlayer(contentsOf: url)
-            player?.numberOfLoops = -1 // 无限循环
-            player?.volume = 0
-            player?.prepareToPlay()
-            player?.play()
-            
-            currentTrack = trackName
-            fadeIn(duration: 4.0)
+            // 只有在没有播放器或播放器未在播放时才创建新的
+            if player == nil || !(player?.isPlaying ?? false) {
+                // 停止之前的播放器（如果有）
+                player?.stop()
+                player = nil
+                
+                player = try AVAudioPlayer(contentsOf: url)
+                player?.numberOfLoops = -1 // 无限循环
+                player?.volume = 0 // 初始音量为0，将通过淡入逐渐增加
+                player?.prepareToPlay()
+                
+                let didPlay = player?.play() ?? false
+                print("AudioManager: 播放器启动: \(didPlay), 当前音量设置: \(player?.volume ?? 0)")
+                
+                currentTrack = trackName
+                fadeIn(duration: 4.0)
+                print("AudioManager: 开始淡入，目标音量: \(volume)")
+            } else {
+                print("AudioManager: 播放器已在运行，不重新创建")
+            }
         } catch {
-            print("Failed to play audio: \(error)")
+            print("AudioManager: 播放音频失败: \(error)")
         }
     }
     
