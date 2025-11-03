@@ -92,4 +92,6 @@ iOSInjectionProject/
 # macOS
 .DS_Store
 
+# Documentation files (not for public repo)
+需求说明.md
 IMPLEMENTATION.md
