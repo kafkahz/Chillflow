@@ -95,3 +95,9 @@ iOSInjectionProject/
 # Documentation files (not for public repo)
 需求说明.md
 IMPLEMENTATION.md
+
+
+
+create_dmg.sh
+build/
+ChillFlow.dmg
