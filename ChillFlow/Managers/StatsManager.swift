@@ -14,10 +14,54 @@ class StatsManager: ObservableObject {
     @Published var records: [FocusRecord] = []
     
     private let storageKey = "chillflow_focus_records"
+    private let hasLaunchedKey = "chillflow_has_launched"
     
     private init() {
-        loadRecords()
-        addTestDataIfNeeded()
+        // 检查是否是首次启动
+        let hasLaunched = UserDefaults.standard.bool(forKey: hasLaunchedKey)
+        
+        if !hasLaunched {
+            // 首次启动，清除所有数据
+            records = []
+            saveRecords()
+            // 标记应用已启动过
+            UserDefaults.standard.set(true, forKey: hasLaunchedKey)
+            print("首次启动，已清除所有专注时长数据")
+        } else {
+            // 非首次启动，正常加载数据
+            loadRecords()
+            // 清除之前可能添加的测试数据（向后兼容）
+            clearTestData()
+        }
+    }
+    
+    // 清除测试数据（周一上午0-7时的数据）- 向后兼容旧版本
+    private func clearTestData() {
+        let calendar = Calendar.current
+        let now = Date()
+        
+        // 计算本周一的日期
+        let components = calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: now)
+        guard let weekStartDate = calendar.date(from: components) else { return }
+        
+        // 确保是周一（weekday = 2）
+        let weekday = calendar.component(.weekday, from: weekStartDate)
+        let daysFromMonday = weekday == 1 ? 1 : weekday - 2
+        guard let weekStart = calendar.date(byAdding: .day, value: daysFromMonday, to: weekStartDate) else { return }
+        
+        // 移除本周一上午（0-7时）的测试数据
+        let beforeCount = records.count
+        records.removeAll { record in
+            let recordDate = calendar.startOfDay(for: record.date)
+            let mondayStart = calendar.startOfDay(for: weekStart)
+            return recordDate == mondayStart && record.hour >= 0 && record.hour <= 7
+        }
+        
+        // 如果有数据被移除，保存更改
+        if records.count < beforeCount {
+            saveRecords()
+            print("已清除测试数据")
+        }
     }
     
     // 添加测试数据：周一上午75分钟

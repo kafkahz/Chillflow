@@ -17,6 +17,8 @@
 		F1015 /* StatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1016 /* StatsView.swift */; };
 		FC1988CC2EB8929B0053533B /* focus2.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FC1988CB2EB8929B0053533B /* focus2.mp3 */; };
 		FCC7AD2E2EB4B93A00B1871E /* focus1.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = FCC7AD2B2EB4B93A00B1871E /* focus1.mp3 */; };
+		F1039 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1040 /* Assets.xcassets */; };
+		F1042 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = F1041 /* AppIcon.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,7 @@
 		F1019 /* ChillFlow.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChillFlow.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC1988CB2EB8929B0053533B /* focus2.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus2.mp3; sourceTree = "<group>"; };
 		FCC7AD2B2EB4B93A00B1871E /* focus1.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = focus1.mp3; sourceTree = "<group>"; };
+		F1041 /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -53,6 +56,8 @@
 				F1025 /* Managers */,
 				F1026 /* Views */,
 				F1027 /* Resources */,
+				F1040 /* Assets.xcassets */,
+				F1041 /* AppIcon.icns */,
 				F1018 /* Info.plist */,
 			);
 			path = ChillFlow;
@@ -155,6 +160,8 @@
 			files = (
 				FC1988CC2EB8929B0053533B /* focus2.mp3 in Resources */,
 				FCC7AD2E2EB4B93A00B1871E /* focus1.mp3 in Resources */,
+				F1039 /* Assets.xcassets in Resources */,
+				F1042 /* AppIcon.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -300,7 +307,7 @@
 		F1037 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon";
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -330,7 +337,7 @@
 		F1038 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIcon";
 				CODE_SIGN_ENTITLEMENTS = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
