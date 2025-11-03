@@ -23,7 +23,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         if let button = statusItem?.button {
             let image = NSImage(systemSymbolName: "leaf.fill", accessibilityDescription: "ChillFlow")
-            image?.size = NSSize(width: 26, height: 26) // 调整图标大小
+            image?.size = NSSize(width: 28, height: 28) // 调整图标大小
             button.image = image
             button.image?.isTemplate = true
             button.action = #selector(togglePopover)
@@ -94,7 +94,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         guard let button = statusItem?.button else { return }
         
         let baseImage = NSImage(systemSymbolName: "leaf.fill", accessibilityDescription: "ChillFlow")
-        baseImage?.size = NSSize(width: 26, height: 26) // 调整图标大小
+        baseImage?.size = NSSize(width: 28, height: 28) // 调整图标大小
         
         // 确保使用等宽字体，避免数字变化时宽度变化
         if button.font == nil {

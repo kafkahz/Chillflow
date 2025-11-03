@@ -41,18 +41,25 @@ struct MainView: View {
             .padding(.bottom, 4)
             .frame(height: 30) // 固定Tab栏高度
             
-            // Tab内容（固定高度区域）
-            Group {
-                if selectedTab == 0 {
+            // Tab内容（带滑动动画）
+            GeometryReader { geometry in
+                HStack(spacing: 0) {
+                    // 控制视图
                     ControlView()
                         .environmentObject(timerManager)
                         .environmentObject(audioManager)
-                } else {
+                        .frame(width: geometry.size.width)
+                    
+                    // 统计视图
                     StatsView()
                         .environmentObject(statsManager)
+                        .frame(width: geometry.size.width)
                 }
+                .offset(x: -CGFloat(selectedTab) * geometry.size.width)
+                .animation(.easeInOut(duration: 0.3), value: selectedTab)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity) // 占据剩余空间
+            .clipped() // 裁剪超出边界的内容
         }
         .frame(width: 320, height: 300)
         .background(Color(NSColor.windowBackgroundColor)) // 设置明确背景色，确保不透明

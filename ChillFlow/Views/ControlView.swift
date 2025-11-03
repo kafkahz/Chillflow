@@ -15,7 +15,7 @@ struct ControlView: View {
                     .padding(.top, 15)
                 
                 // 时间显示
-                Text(formatTime(timerManager.remainingTime))
+                Text(formatTimeForDisplay())
                     .font(.system(size: 45, weight: .light, design: .rounded))
                     .monospacedDigit()
                 
@@ -114,6 +114,14 @@ struct ControlView: View {
             .padding(.bottom, 4)
             .padding(.top, 0)
         }
+    }
+    
+    private func formatTimeForDisplay() -> String {
+        // 空闲状态时显示"25:00"
+        if case .idle = timerManager.currentState {
+            return "25:00"
+        }
+        return formatTime(timerManager.remainingTime)
     }
     
     private func formatTime(_ time: TimeInterval) -> String {

@@ -35,7 +35,7 @@ struct StatsView: View {
                     .buttonStyle(PlainButtonStyle())
                 }
                 .padding(.horizontal, 20)
-                .padding(.top, 15)
+                .padding(.top, 40) 
                 
                 // 总专注时长和热力图
                 Group {
