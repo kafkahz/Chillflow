@@ -9,6 +9,7 @@ class TimerManager: ObservableObject {
     private var timer: Timer?
     private var startDate: Date?
     private var pausedRemainingTime: TimeInterval = 0
+    private var resumeStartTime: TimeInterval = 0  // 恢复时的剩余时间
     
     // 番茄钟配置
     private let focusDuration: TimeInterval = 25 * 60 // 25分钟
@@ -41,26 +42,8 @@ class TimerManager: ObservableObject {
     func pause() {
         guard timer != nil else { return }
         
-        // 保存剩余时间和已暂停时间
-        if let startDate = startDate {
-            let elapsed = Date().timeIntervalSince(startDate)
-            let baseState = currentState.getBaseState()
-            let totalDuration: TimeInterval = {
-                switch baseState {
-                case .focus:
-                    return focusDuration
-                case .rest:
-                    return restDuration
-                case .longRest:
-                    return longRestDuration
-                default:
-                    return 0
-                }
-            }()
-            pausedRemainingTime = max(0, totalDuration - elapsed)
-        } else {
-            pausedRemainingTime = remainingTime
-        }
+        // 保存当前的剩余时间（tick()已经正确计算了剩余时间）
+        pausedRemainingTime = remainingTime
         
         let baseState = currentState.getBaseState()
         currentState = .paused(state: baseState)
@@ -119,6 +102,7 @@ class TimerManager: ObservableObject {
         focusCount = 0
         startDate = nil
         pausedRemainingTime = 0
+        resumeStartTime = 0
     }
     
     private func startFocus() {
@@ -139,6 +123,7 @@ class TimerManager: ObservableObject {
     private func startTimer(with duration: TimeInterval) {
         remainingTime = duration
         pausedRemainingTime = 0
+        resumeStartTime = duration  // 记录恢复时的起始剩余时间
         startDate = Date()
         
         timer?.invalidate()
@@ -154,22 +139,8 @@ class TimerManager: ObservableObject {
         guard let startDate = startDate else { return }
         
         let elapsed = Date().timeIntervalSince(startDate)
-        let baseState = currentState.getBaseState()
-        
-        let totalDuration: TimeInterval = {
-            switch baseState {
-            case .focus:
-                return focusDuration
-            case .rest:
-                return restDuration
-            case .longRest:
-                return longRestDuration
-            default:
-                return 0
-            }
-        }()
-        
-        remainingTime = max(0, totalDuration - elapsed)
+        // 基于恢复时的起始剩余时间减去已过时间，而不是从总时长重新计算
+        remainingTime = max(0, resumeStartTime - elapsed)
         
         if remainingTime <= 0 {
             onTimerComplete()
